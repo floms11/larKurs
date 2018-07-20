@@ -1,7 +1,7 @@
 @extends('mainBody')
 @section('section')
 	<div id="ytplayer"></div>
-	<form class="inputSection" action="/larKurs/triger/video">
+	<form class="inputSection" action="/larKurs/triger/video" method="get">
 		<input type="text" id="lenght" name="lenght" value="0" style="display: none;">
 		<input type="submit" class="button1" value="Next">
 	</form>

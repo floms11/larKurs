@@ -1,7 +1,14 @@
 @extends('mainBody')
 @section('section')
-	<form class="inputSection" action="larKurs/triger/">
-		<input type="text" name="name" class="input1" placeholder="Введи своё имя">
+    @if (count($errors) > 0)
+      <div class="erShow">
+          @foreach ($errors->all() as $error)
+            <div>{{ $error }}</div>
+          @endforeach
+      </div>
+    @endif
+	<form class="inputSection" action="larKurs/triger/" method="get">
+		<input type="text" name="name" class="input1" placeholder="Введи своё имя" required>
 		<input type="submit" class="button1" value="Next">
 	</form>
 	<p>Результаты предыдущих 10 прохождений:</p>

@@ -12,19 +12,19 @@
 */
 
 
-Route::get('/larKurs/triger',        'pagesController@trigerReg');
-Route::get('/larKurs/triger/{page}', 'pagesController@triger');
+Route::get('/larKurs/triger',        'PagesController@trigerReg');
+Route::get('/larKurs/triger/{page}', 'PagesController@triger');
 
 
-Route::get('/larKurs/',              'pagesController@start');
-Route::get('/larKurs/start',         'pagesController@start');
+Route::get('/larKurs/',              'PagesController@start');
+Route::get('/larKurs/start',         'PagesController@start');
 
 
-Route::get('/larKurs/text', 	     'pagesController@text');
-Route::get('/larKurs/summ', 	     'pagesController@summ');
-Route::get('/larKurs/languages',     'pagesController@languages');
-Route::get('/larKurs/days',          'pagesController@days');
-Route::get('/larKurs/video',         'pagesController@video');
-Route::get('/larKurs/finish',        'pagesController@finish');
+Route::get('/larKurs/text', 	     'PagesController@text');
+Route::get('/larKurs/summ', 	     'PagesController@summ');
+Route::get('/larKurs/languages',     'PagesController@languages');
+Route::get('/larKurs/days',          'PagesController@days');
+Route::get('/larKurs/video',         'PagesController@video');
+Route::get('/larKurs/finish',        'PagesController@finish');
 
-Route::get('/larKurs/restart',       'pagesController@restart');
+Route::get('/larKurs/restart',       'PagesController@restart');

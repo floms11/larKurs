@@ -1,7 +1,7 @@
 @extends('mainBody')
 @section('section')
 	<p>Какие языки программирования ты знаешь?</p>
-	<form class="inputSection" action="/larKurs/triger/languages">
+	<form class="inputSection" action="/larKurs/triger/languages" method="get">
 		<div class="checkList">
 			<input type="checkbox" class="checkbox" name="v1" value="php">PHP<br>
 			<input type="checkbox" class="checkbox" name="v2" value="python">Python<br>

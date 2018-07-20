@@ -1,7 +1,7 @@
 @extends('mainBody')
 @section('section')
 	<p>Какой сегодня день недели?</p>
-	<form class="inputSection" action="/larKurs/triger/days">
+	<form class="inputSection" action="/larKurs/triger/days" method="get">
 		<div class="checkList">
 			@foreach($days as $day)
 				<input type="radio" name="value" class="checkbox" value="{{ $day }}" value="php">{{ $daysText[$day] }}<br>
