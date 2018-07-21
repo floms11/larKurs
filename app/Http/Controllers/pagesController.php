@@ -25,8 +25,7 @@ class PagesController extends Controller
         if ($count > 0) {
             $page = $pagesRandom[rand(0, $count - 1)];
             $request->session()->put($page, true);
-        }
-        else {
+        } else {
             Users::where('id', $userID)->update(['endTime' => time()]);
         }
 
@@ -246,8 +245,7 @@ class PagesController extends Controller
             $usersData = Users::where('id', $userID)->get();
             $userData = $usersData[0];
             return self::getPage('finish', $request, compact('userData'));
-        }
-        else {
+        } else {
             return self::getPage('finish', $request);
         }
     }
