@@ -6,9 +6,14 @@ use App\Users;
 
 class PagesController extends Controller
 {
-    const MAX_RESULT = 5; // Максимальное количество полученых балов
-    const MIN_VIDEO_LENGHT = 55; // Длина видео (примерно 95% от длины, что бы засчитать просмотр)
-    // Получаем(и "устанавливаем") рандомную след. страницу
+    const MAX_RESULT = 5; // Maximum number of points received
+    const MIN_VIDEO_LENGHT = 55; // Length of video
+    /**
+     * Change the page to random
+     * @param  integer $userID          User id
+     * @param  Request $request         Request
+     * @return string                   Page Name
+     */
     private function getRandomPage($userID, Request $request)
     {
         $pages = ['text', 'summ', 'languages', 'days', 'video'];
@@ -30,12 +35,22 @@ class PagesController extends Controller
         $request->session()->put('current', $page);
         return $page;
     }
-    // Получить текущую страницу
+    /**
+     * Get the current page
+     * @param  Request $request         Request
+     * @return string                   Current page
+     */
     private function getCurrentPage(Request $request)
     {
         return $request->session()->get('current', '');
     }
-    // Возвращает страницу, либо редирект на текущую
+    /**
+     * Returns a page, or redirects to the current one
+     * @param  string $page             Get page name
+     * @param  Request $request         Request
+     * @param  array [$params = null]   Array of Variables
+     * @return string                   Returns a page, or redirects to the current one
+     */
     private function getPage($page, Request $request, $params = null)
     {
         $cp = self::getCurrentPage($request);
@@ -44,8 +59,12 @@ class PagesController extends Controller
         } else {
             return ($params == null) ? view($page) : view($page, $params);
         }
+        getCurrentPage
     }
-    // Плюсует балл пользователю
+    /**
+     * Will score the user
+     * @param integer $userID User id
+     */
     private function plusResult($userID)
     {
         $res = Users::where('id', $userID)->get()[0]->result;
@@ -58,33 +77,38 @@ class PagesController extends Controller
         }
         Users::where('id', $userID)->update(['result' => $res]);
     }
-    // Обработка всех действий
+    /**
+     * Processing of basic actions
+     * @param  Request $request         Request
+     * @param  string $page             Page name
+     * @return string                   Redirect last page
+     */
     public function triger(Request $request, $page)
     {
         $currentPage = self::getCurrentPage($request);
         $userID = $request->session()->get('id', 0);
 
-        // Если пользователь не авторизирован
+        // If the user is not authorized
         if ($userID < 1) {
             return redirect('larKurs/');
         }
-        // Если запрос не к текущей "операции"
+        // If the request is not for the current "operation"
         if ($currentPage !== $page) {
             return redirect('/larKurs/' . $currentPage);
         }
 
         switch ($page) {
-            case 'text': // В любом случаи даем один балл
+            case 'text':
                 self::plusResult($userID);
                 break;
-            case 'summ': // Даем балл, если сумма чисел правильная
+            case 'summ': // Give a score if the sum of the numbers is correct
                 $res = $request->session()->get('summRes');
                 $resInput = $request->input('summ');
                 if ($resInput == $res) {
                     self::plusResult($userID);
                 }
                 break;
-            case 'languages': // Опеределяем какие языки пользователь выбрал, и выполняем нужные нам действия (параграф 4.4)
+            case 'languages': // We determine which languages the user has chosen, and perform the actions we need (paragraph 4.4)
                 $resInput = array();
                 for ($i = 1; $i < 6; $i++) {
                     $resInput[] = $request->input('v' . $i);
@@ -103,14 +127,14 @@ class PagesController extends Controller
                     self::plusResult($userID);
                 }
                 break;
-            case 'days': // Сверяем текщий день недели
+            case 'days': // We are verifying the current day of the week
                 $res = $request->session()->get('daysTrue');
                 $resInput = $request->input('value');
                 if ($resInput == $res) {
                     self::plusResult($userID);
                 }
                 break;
-            case 'video': // Проверяем просмотр видео до конца
+            case 'video': // Check the video until the end
                 $startTime = $request->session()->get('videoStartTime');
                 $resInput = $request->input('lenght');
                 if (time() - $startTime >= $resInput && $resInput > self::MIN_VIDEO_LENGHT) {
@@ -120,28 +144,37 @@ class PagesController extends Controller
         }
         return redirect('/larKurs/' . self::getRandomPage($userID, $request));
     }
-    // Регистрируем на прохождения "курса"
+    /**
+     * We register for the passage of the "course"
+     * @param  Request $request         Request
+     * @return string                   Redirect page
+     */
     public function trigerReg(Request $request)
     {
         $userID = $request->session()->get('id', 0);
-        // Регистрируем пользователя
+        // We register the user
         if ($userID < 1) {
             $this->validate($request, [
                 'name' => 'alpha_dash|min:2|max:40'
             ]);
             $name = $request->input('name');
             if (empty($name)) {
-                // Имя не введено
+                // No name entered
                 return redirect('/larKurs/');
             }
             $id = Users::insertGetId(['name' => $name, 'startTime' => time()]);
             $userID = $request->session()->put('id', $id);
-            // Зарегистрировали, теперь начинаем курс
+            // Registered, now start the course
             return redirect('/larKurs/' . self::getRandomPage($userID, $request));
         }
-        // Пользователь уже зарегистрирован, перенаправляем на последнюю страницу
+        // User is already registered, redirected to the last page
         return redirect('/larKurs/' . self::getCurrentPage($request));
     }
+    /**
+     * Controller page "start"
+     * @param  Request $request         Request
+     * @return string                   Page "start" and redirect to current page
+     */
     public function start(Request $request)
     {
         $list = Users::where('endTime', '>', 0)
@@ -154,10 +187,20 @@ class PagesController extends Controller
         }
         return view('start', compact('list'));
     }
+    /**
+     * Controller page "text"
+     * @param  Request $request         Request
+     * @return string                   Page "text" and redirect to current page
+     */
     public function text(Request $request)
     {
         return self::getPage('text', $request);
     }
+    /**
+     * Controller page "summ"
+     * @param  Request $request         Request
+     * @return string                   Page "summ" and redirect to current page
+     */
     public function summ(Request $request)
     {
         $dataArray = array();
@@ -172,10 +215,20 @@ class PagesController extends Controller
         }
         return self::getPage('summ', $request, $dataArray);
     }
+    /**
+     * Controller page "languages"
+     * @param  Request $request         Request
+     * @return string                   Page "languages" and redirect to current page
+     */
     public function languages(Request $request)
     {
         return self::getPage('languages', $request);
     }
+    /**
+     * Controller page "days"
+     * @param  Request $request         Request
+     * @return string                   Page "days" and redirect to current page
+     */
     public function days(Request $request)
     {
         $daysText = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
@@ -186,21 +239,21 @@ class PagesController extends Controller
             $days = array();
             $days[0] = $dayNow;
 
-            // Первый
+            // First
             if ($days[0] <= 0) {
                 $days[1] = 6;
             } else {
                 $days[1] = $days[0] - 1;
             }
 
-            // Второй
+            // Second
             if ($days[0] >= 6) {
                 $days[2] = 0;
             } else {
                 $days[2] = $days[0] + 1;
             }
 
-            // Третий
+            // The third
             if ($days[2] >= 6) {
                 $days[3] = 0;
             } else {
@@ -214,11 +267,21 @@ class PagesController extends Controller
         }
         return self::getPage('days', $request, compact('days', 'daysText'));
     }
+    /**
+     * Controller page "video"
+     * @param  Request $request         Request
+     * @return string                   Page "video" and redirect to current page
+     */
     public function video(Request $request)
     {
         $request->session()->put('videoStartTime', time());
         return self::getPage('video', $request);
     }
+    /**
+     * Controller page "finish"
+     * @param  Request $request         Request
+     * @return string                   Page "finish" and redirect to current page
+     */
     public function finish(Request $request)
     {
         $userID = $request->session()->get('id', 0);
@@ -230,6 +293,11 @@ class PagesController extends Controller
             return self::getPage('finish', $request);
         }
     }
+    /**
+     * Restart Kurs
+     * @param  Request $request         Request
+     * @return string                   Redirect start page
+     */
     public function restart(Request $request)
     {
         $request->session()->flush();
