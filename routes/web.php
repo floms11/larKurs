@@ -11,14 +11,11 @@
 |
 */
 
-
 Route::get('/larKurs/triger',        'PagesController@trigerReg');
 Route::get('/larKurs/triger/{page}', 'PagesController@triger');
 
-
 Route::get('/larKurs/',              'PagesController@start');
 Route::get('/larKurs/start',         'PagesController@start');
-
 
 Route::get('/larKurs/text', 	     'PagesController@text');
 Route::get('/larKurs/summ', 	     'PagesController@summ');
